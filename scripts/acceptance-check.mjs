@@ -9,7 +9,12 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const node = process.execPath;
 const cli = path.join(root, "dist", "cli.js");
-const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmCli = process.env.npm_execpath;
+
+assert.ok(
+  npmCli,
+  "npm_execpath is unavailable; run acceptance through `npm run acceptance`",
+);
 
 function run(program, args, expected = 0) {
   const result = spawnSync(program, args, {
@@ -26,10 +31,10 @@ function run(program, args, expected = 0) {
 }
 
 try {
-  run(npm, ["run", "check"]);
-  run(npm, ["run", "action:check"]);
-  run(npm, ["run", "package:check"]);
-  run(npm, ["run", "demo"]);
+  run(node, [npmCli, "run", "check"]);
+  run(node, [npmCli, "run", "action:check"]);
+  run(node, [npmCli, "run", "package:check"]);
+  run(node, [npmCli, "run", "demo"]);
 
   const output = await fs.mkdtemp(
     path.join(os.tmpdir(), "agent-crash-test-acceptance-"),

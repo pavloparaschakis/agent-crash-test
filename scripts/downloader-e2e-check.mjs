@@ -15,7 +15,12 @@ const cooperativeClient = path.join(
   "examples",
   "cooperative-client.js",
 );
-const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmCli = process.env.npm_execpath;
+
+assert.ok(
+  npmCli,
+  "npm_execpath is unavailable; run these journeys through `npm run test:downloader`",
+);
 
 function execute(program, args, options = {}) {
   return spawnSync(program, args, {
@@ -375,7 +380,7 @@ assertions:
 });
 
 test("9. the copy-ready GitHub Action consumer preserves green and red outcomes", () => {
-  const action = execute(npm, ["run", "action:check"], {
+  const action = execute(process.execPath, [npmCli, "run", "action:check"], {
     cwd: root,
     timeout: 60_000,
   });
@@ -384,7 +389,7 @@ test("9. the copy-ready GitHub Action consumer preserves green and red outcomes"
 });
 
 test("10. the packed downloader artifact runs doctor and the full demo", () => {
-  const packaged = execute(npm, ["run", "package:check"], {
+  const packaged = execute(process.execPath, [npmCli, "run", "package:check"], {
     cwd: root,
     timeout: 90_000,
   });

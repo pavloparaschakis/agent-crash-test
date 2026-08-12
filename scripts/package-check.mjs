@@ -7,7 +7,12 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
-const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmCli = process.env.npm_execpath;
+
+assert.ok(
+  npmCli,
+  "npm_execpath is unavailable; run this check through `npm run package:check`",
+);
 const temporary = await fs.mkdtemp(
   path.join(os.tmpdir(), "agent-crash-test-package-"),
 );
@@ -55,7 +60,13 @@ async function extractOffline(tarball, consumer) {
 
 try {
   const packed = JSON.parse(
-    run(npm, ["pack", "--pack-destination", temporary, "--json"]),
+    run(process.execPath, [
+      npmCli,
+      "pack",
+      "--pack-destination",
+      temporary,
+      "--json",
+    ]),
   );
   const metadata = packed[0];
   const tarball = metadata?.filename;
@@ -89,8 +100,15 @@ try {
 
   const tarballPath = path.join(temporary, tarball);
   const install = execute(
-    npm,
-    ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarballPath],
+    process.execPath,
+    [
+      npmCli,
+      "install",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund",
+      tarballPath,
+    ],
     consumer,
   );
   let installMode = "clean npm install";
