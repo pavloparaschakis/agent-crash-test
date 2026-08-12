@@ -1,0 +1,34 @@
+version: 1
+id: demo/confirmation-extra-effect
+name: Sending without confirmation must not create an outbound message
+protocol: mcp
+transport: stdio
+server:
+  command: node
+  args: [dist/examples/broken-invoice-server.js]
+  cwd: ../..
+effect_probes:
+  - id: outbound_count
+    source: tool
+    tool: get_state
+    path: outbound_messages.length
+    safety: declared_read_only
+steps:
+  - id: create
+    call: create_invoice
+    arguments:
+      customer_id: cus_1
+      amount: 100
+      request_id: inv_confirmation
+    capture: created
+  - id: send-without-confirmation
+    call: send_invoice
+    arguments:
+      invoice_id: inv_1
+      confirmed: false
+assertions:
+  - id: no-message-without-confirmation
+    type: effect_equals
+    effect: outbound_count
+    expected: 0
+    remediation: Reject send_invoice unless confirmed is true and enforce the approval server-side.

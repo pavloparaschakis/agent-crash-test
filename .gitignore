@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+.agent-crash-test/
+.release-assets/
+*.log
+.DS_Store

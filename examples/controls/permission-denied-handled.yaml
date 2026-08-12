@@ -1,0 +1,29 @@
+version: 1
+id: control/permission-denied-handled
+name: Baseline authorized write is observable
+description: The healthy no-mutation control for permission-denied handling.
+protocol: mcp
+transport: stdio
+server:
+  command: node
+  args: [dist/examples/broken-invoice-server.js]
+  cwd: ../..
+effect_probes:
+  - id: invoice_count
+    source: tool
+    tool: get_state
+    path: invoices.length
+    safety: declared_read_only
+steps:
+  - id: create
+    call: create_invoice
+    arguments:
+      customer_id: cus_control
+      amount: 100
+      request_id: req_control_permission
+assertions:
+  - id: authorized-write-observed
+    type: effect_equals
+    effect: invoice_count
+    expected: 1
+    remediation: Keep authorization decisions explicit and observe the resulting effect.

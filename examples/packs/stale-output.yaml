@@ -1,0 +1,33 @@
+version: 1
+id: demo/stale-output
+name: Stale response is detected by a scenario assertion
+protocol: mcp
+transport: stdio
+server:
+  command: node
+  args: [dist/examples/broken-invoice-server.js]
+  cwd: ../..
+steps:
+  - id: first
+    call: get_customer
+    arguments:
+      customer_id: cus_1
+    capture: first
+  - id: second
+    call: get_customer
+    arguments:
+      customer_id: cus_2
+    capture: second
+mutations:
+  - id: stale-second-customer
+    type: stale_result
+    applies_to: get_customer
+    occurrence: 2
+    seed: 1
+assertions:
+  - id: second-customer-is-fresh
+    type: result_path_equals
+    step: second
+    path: customer.id
+    expected: cus_2
+    remediation: Preserve response-to-request correlation and reject stale cached data.

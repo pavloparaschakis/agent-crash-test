@@ -1,0 +1,6 @@
+execution_engine: asyncio
+logger:
+  transports: [console]
+  level: warning
+openai:
+  default_model: gpt-4o-mini

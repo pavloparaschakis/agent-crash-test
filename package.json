@@ -1,0 +1,90 @@
+{
+  "name": "agent-crash-test",
+  "version": "0.1.0",
+  "description": "Effect-level chaos and contract testing for tool-using agents.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "author": "Agent Crash Test contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pavloparaschakis/agent-crash-test.git"
+  },
+  "homepage": "https://github.com/pavloparaschakis/agent-crash-test#readme",
+  "bugs": {
+    "url": "https://github.com/pavloparaschakis/agent-crash-test/issues"
+  },
+  "keywords": [
+    "mcp",
+    "ai-agents",
+    "agent-tools",
+    "testing",
+    "developer-tools",
+    "chaos-engineering",
+    "contract-testing",
+    "reliability-engineering",
+    "jsonl"
+  ],
+  "files": [
+    "dist",
+    "!dist/test",
+    "examples",
+    "action.yml",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CHANGELOG.md"
+  ],
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "agent-crash-test": "dist/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node scripts/clean.mjs",
+    "demo": "npm run build && node dist/cli.js demo",
+    "test": "npm run build && node scripts/run-tests.mjs",
+    "test:unit": "npm run build && node scripts/run-tests.mjs unit",
+    "test:integration": "npm run build && node scripts/run-tests.mjs integration",
+    "test:examples": "npm run build && node scripts/run-tests.mjs examples",
+    "test:downloader": "npm run build && node --test scripts/downloader-e2e-check.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "npm run typecheck && npm run format:check",
+    "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.mjs\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.mjs\"",
+    "docs:check": "node scripts/check-links.mjs",
+    "workflow:check": "node scripts/workflow-config-check.mjs",
+    "action:check": "npm run build && node scripts/action-sample-check.mjs",
+    "adapter:check": "npm run build && node scripts/adapter-examples-check.mjs",
+    "package:check": "npm run build && node scripts/package-check.mjs",
+    "release:check": "node scripts/release-assets-check.mjs",
+    "release:assets": "node scripts/release-assets.mjs .release-assets",
+    "acceptance": "npm run build && node scripts/acceptance-check.mjs",
+    "check": "npm run lint && npm run docs:check && npm run workflow:check && npm run release:check && npm run adapter:check && npm test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "overrides": {
+    "@hono/node-server": "2.0.11"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "prettier": "3.6.2",
+    "typescript": "^5.9.0"
+  }
+}

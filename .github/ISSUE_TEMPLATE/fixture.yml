@@ -1,0 +1,23 @@
+name: Fixture proposal
+description: Propose a reusable agent-tool failure pack.
+title: "fixture: "
+labels: [fixture, triage]
+body:
+  - type: textarea
+    attributes:
+      label: Failure contract
+      description: State the intended effect, forbidden effect, and deterministic reproduction.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Minimal pack
+      description: Paste a redacted YAML pack or fixture.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Remediation
+      description: What change would prevent this failure?
+    validations:
+      required: true

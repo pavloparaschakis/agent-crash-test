@@ -1,0 +1,33 @@
+initial_state:
+  invoices: []
+  outbound_messages: []
+tools:
+  create_invoice:
+    description: Create a draft invoice.
+    annotations:
+      readOnlyHint: false
+      destructiveHint: false
+      idempotentHint: true
+      openWorldHint: false
+    result:
+      invoice:
+        id: "$args.request_id"
+        customer_id: "$args.customer_id"
+        amount: "$args.amount"
+        status: draft
+    effects:
+      - op: append
+        path: invoices
+        value:
+          id: "$args.request_id"
+          customer_id: "$args.customer_id"
+          amount: "$args.amount"
+          status: draft
+  get_state:
+    description: Read local fixture state.
+    annotations:
+      readOnlyHint: true
+      destructiveHint: false
+      idempotentHint: true
+      openWorldHint: false
+    result: "$state"

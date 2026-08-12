@@ -1,0 +1,35 @@
+version: 1
+id: control/permission-denied-incorrect-success
+name: Incorrectly treating permission denial as success is detected
+description: A negative control that must fail when a denied write is expected to happen.
+protocol: mcp
+transport: stdio
+server:
+  command: node
+  args: [dist/examples/broken-invoice-server.js]
+  cwd: ../..
+effect_probes:
+  - id: invoice_count
+    source: tool
+    tool: get_state
+    path: invoices.length
+    safety: declared_read_only
+steps:
+  - id: create
+    call: create_invoice
+    arguments:
+      customer_id: cus_control
+      amount: 100
+      request_id: req_control_permission_denied
+mutations:
+  - id: deny-create
+    type: permission_denied
+    applies_to: create_invoice
+    occurrence: 1
+    seed: 1
+assertions:
+  - id: incorrect-success-expectation
+    type: effect_equals
+    effect: invoice_count
+    expected: 1
+    remediation: Treat permission denial as a distinct outcome and do not claim the write happened.

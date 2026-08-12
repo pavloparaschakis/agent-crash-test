@@ -1,0 +1,16 @@
+name: False positive
+description: Report an assertion or report that does not match observed behavior.
+title: "false positive: "
+labels: [bug, triage]
+body:
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Include a minimal, secret-free command and pack.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected versus observed
+    validations:
+      required: true

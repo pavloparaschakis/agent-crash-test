@@ -1,0 +1,33 @@
+version: 1
+id: demo/permission-denied-no-effect
+name: Permission denial must leave state unchanged
+protocol: mcp
+transport: stdio
+server:
+  command: node
+  args: [dist/examples/broken-invoice-server.js]
+  cwd: ../..
+effect_probes:
+  - id: invoice_count
+    source: tool
+    tool: get_state
+    path: invoices.length
+    safety: declared_read_only
+steps:
+  - id: create
+    call: create_invoice
+    arguments:
+      customer_id: cus_1
+      amount: 100
+      request_id: req_denied
+mutations:
+  - id: deny-create
+    type: permission_denied
+    applies_to: create_invoice
+    occurrence: 1
+    seed: 1
+assertions:
+  - id: no-invoice-created
+    type: effect_equals
+    effect: invoice_count
+    expected: 0

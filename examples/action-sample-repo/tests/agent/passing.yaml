@@ -1,0 +1,24 @@
+version: 1
+id: sample/duplicate-effect-visible
+name: Sample duplicate effect is visible
+protocol: mcp
+transport: fixture
+server:
+  fixture: ../fixtures/invoice.yaml
+state_contract:
+  effects:
+    - path: invoices.length
+      expected_delta: 2
+steps:
+  - id: create
+    call: create_invoice
+mutations:
+  - id: duplicate-create
+    type: duplicate_call
+    applies_to: create_invoice
+    occurrence: 1
+assertions:
+  - id: two-physical-calls
+    type: call_count
+    tool: create_invoice
+    exactly: 2

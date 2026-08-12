@@ -1,0 +1,37 @@
+name: Feature request
+description: Propose a focused capability that improves reproducible agent-tool testing.
+title: "[feature] "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep proposals scoped to a reproducible agent-tool failure, observable effect, recovery behavior, adapter, or contributor workflow. Explain why the capability belongs in the local-first core instead of an application-specific integration.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and user
+      description: Who is blocked, and what failure is not currently reproducible?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the pack, CLI, report, or Action behavior you expect.
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety and trust boundary
+      description: Explain side effects, credentials, network access, redaction, and how the feature fails closed.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance test
+      description: Give a passing case, failing case, and report evidence that would prove the feature.
+    validations:
+      required: true

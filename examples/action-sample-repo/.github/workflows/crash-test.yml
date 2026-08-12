@@ -1,0 +1,33 @@
+name: Agent Crash Test sample
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  passing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: pavloparaschakis/agent-crash-test@REPLACE_WITH_COMMIT
+        with:
+          path: tests/agent/passing.yaml
+          format: terminal,markdown,json
+          output: artifacts/agent-crash-test-passing
+          fail-on: error
+
+  intentional-failure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      # This job is intentionally red. The composite Action uploads its
+      # Markdown/JSON artifacts from an always() step before returning 1.
+      - uses: pavloparaschakis/agent-crash-test@REPLACE_WITH_COMMIT
+        with:
+          path: tests/agent/failing.yaml
+          format: terminal,markdown,json
+          output: artifacts/agent-crash-test-failing
+          fail-on: error

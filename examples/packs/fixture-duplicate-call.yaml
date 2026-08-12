@@ -1,0 +1,38 @@
+version: 1
+id: fixture/duplicate-call
+name: Fixture duplicate invocation has one intended effect
+protocol: mcp
+transport: fixture
+server:
+  fixture: ../invoice-server.fixture.yaml
+state:
+  initial:
+    invoices: []
+    outbound_messages: []
+effect_probes:
+  - id: invoice_count
+    source: fixture_state
+    path: invoices.length
+steps:
+  - id: create
+    call: create_invoice
+    arguments:
+      customer_id: cus_1
+      amount: 100
+      request_id: fixture_duplicate
+mutations:
+  - id: duplicate-create
+    type: duplicate_call
+    applies_to: create_invoice
+    occurrence: 1
+    seed: 1
+assertions:
+  - id: duplicate-is-visible
+    type: effect_equals
+    effect: invoice_count
+    expected: 2
+  - id: declared-idempotency-is-visible
+    type: annotation_matches
+    tool: create_invoice
+    annotation: idempotentHint
+    expected: true

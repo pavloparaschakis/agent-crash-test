@@ -1,0 +1,28 @@
+version: 1
+id: control/stale-result-fresh
+name: Baseline responses remain correlated to their requests
+description: The healthy no-mutation control for stale-result handling.
+protocol: mcp
+transport: stdio
+server:
+  command: node
+  args: [dist/examples/broken-invoice-server.js]
+  cwd: ../..
+steps:
+  - id: first
+    call: get_customer
+    arguments:
+      customer_id: cus_1
+    capture: first
+  - id: second
+    call: get_customer
+    arguments:
+      customer_id: cus_2
+    capture: second
+assertions:
+  - id: second-customer-is-fresh
+    type: result_path_equals
+    step: second
+    path: customer.id
+    expected: cus_2
+    remediation: Preserve request/response correlation and reject stale cached data.

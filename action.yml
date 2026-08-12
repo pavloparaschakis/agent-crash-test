@@ -1,0 +1,60 @@
+name: Agent Crash Test
+description: Run deterministic MCP crash-test packs and write portable reports.
+inputs:
+  path:
+    description: Pack file or directory to run.
+    required: false
+    default: tests/agent
+  format:
+    description: "Comma-separated report formats: terminal, markdown, json, junit, github-summary, sarif, html."
+    required: false
+    default: terminal,markdown,json
+  output:
+    description: Directory for non-terminal reports.
+    required: false
+    default: artifacts/agent-crash-test
+  fail-on:
+    description: Lowest finding severity that fails the workflow.
+    required: false
+    default: error
+  seed:
+    description: Optional deterministic mutation seed.
+    required: false
+  request-timeout-ms:
+    description: Per-request timeout in milliseconds.
+    required: false
+  max-run-ms:
+    description: Maximum total run duration in milliseconds.
+    required: false
+  allow-unsafe-probes:
+    description: "Runtime opt-in for unsafe probes; the pack must also set execution.allow_unsafe_probes: true."
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        ACT_PATH: ${{ inputs.path }}
+        ACT_FORMAT: ${{ inputs.format }}
+        ACT_OUTPUT: ${{ inputs.output }}
+        ACT_FAIL_ON: ${{ inputs['fail-on'] }}
+        ACT_SEED: ${{ inputs.seed }}
+        ACT_REQUEST_TIMEOUT: ${{ inputs['request-timeout-ms'] }}
+        ACT_MAX_RUN: ${{ inputs['max-run-ms'] }}
+        ACT_ALLOW_UNSAFE: ${{ inputs['allow-unsafe-probes'] }}
+      run: |
+        npm ci --ignore-scripts --prefix "$GITHUB_ACTION_PATH"
+        npm run build --prefix "$GITHUB_ACTION_PATH"
+        command=(node "$GITHUB_ACTION_PATH/dist/cli.js" run "$ACT_PATH" --format "$ACT_FORMAT" --output "$ACT_OUTPUT" --fail-on "$ACT_FAIL_ON" --no-color)
+        if [[ -n "${ACT_SEED:-}" ]]; then command+=(--seed "$ACT_SEED"); fi
+        if [[ -n "${ACT_REQUEST_TIMEOUT:-}" ]]; then command+=(--request-timeout-ms "$ACT_REQUEST_TIMEOUT"); fi
+        if [[ -n "${ACT_MAX_RUN:-}" ]]; then command+=(--max-run-ms "$ACT_MAX_RUN"); fi
+        if [[ "${ACT_ALLOW_UNSAFE:-false}" == "true" ]]; then command+=(--allow-unsafe-probes); fi
+        "${command[@]}"
+    - if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: agent-crash-test-report
+        path: ${{ inputs.output }}
+        if-no-files-found: ignore

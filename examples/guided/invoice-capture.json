@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "captureId": "guided-example",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "target": {
+    "command": "node",
+    "args": ["dist/examples/broken-invoice-server.js"],
+    "cwd": "."
+  },
+  "determinism": "partial",
+  "events": [
+    {
+      "sequence": 1,
+      "timestamp": "2026-01-01T00:00:00.001Z",
+      "side": "target",
+      "kind": "response",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "tools": [
+            {
+              "name": "create_invoice",
+              "annotations": { "readOnlyHint": false }
+            },
+            {
+              "name": "get_state",
+              "annotations": { "readOnlyHint": true }
+            }
+          ]
+        }
+      },
+      "physicalCall": false
+    },
+    {
+      "sequence": 2,
+      "timestamp": "2026-01-01T00:00:00.002Z",
+      "side": "client",
+      "kind": "request",
+      "direction": "client_to_proxy",
+      "message": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "tools/call",
+        "params": {
+          "name": "create_invoice",
+          "arguments": {
+            "customer_id": "cus_example",
+            "amount": 42,
+            "request_id": "req_guided_example"
+          }
+        }
+      },
+      "method": "tools/call",
+      "tool": "create_invoice",
+      "requestId": 3,
+      "physicalCall": false
+    }
+  ],
+  "warnings": []
+}

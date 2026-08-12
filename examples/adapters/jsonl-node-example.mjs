@@ -1,0 +1,56 @@
+const records = [
+  {
+    type: "run_start",
+    run_id: "example-node-run",
+    adapter: "node-example",
+    adapter_version: "1.0.0",
+    protocol: "mcp",
+    transport: "jsonl",
+    determinism: "partial",
+    physical_interception: true,
+    response_mutation: true,
+    state_observation: true,
+    redaction_applied: true,
+  },
+  {
+    type: "tool_call",
+    run_id: "example-node-run",
+    operation_id: "create-1",
+    tool: "create_issue",
+    arguments: { title: "adapter example", request_id: "req-1" },
+    physical_call: true,
+    redaction_applied: true,
+  },
+  {
+    type: "tool_result",
+    run_id: "example-node-run",
+    operation_id: "create-1",
+    status: "unknown",
+    commit_status: "committed",
+    response_status: "lost",
+    error: {
+      kind: "transport_error",
+      message: "response lost after commit",
+      retryable: true,
+      source: "example",
+    },
+    redaction_applied: true,
+  },
+  {
+    type: "state_snapshot",
+    run_id: "example-node-run",
+    observer_id: "issues",
+    source: "test-db",
+    observer_status: "changed",
+    value: { count: 1 },
+    redaction_applied: true,
+  },
+  {
+    type: "run_end",
+    run_id: "example-node-run",
+    status: "complete",
+    redaction_applied: true,
+  },
+];
+
+process.stdout.write(`${records.map((record) => JSON.stringify(record)).join("\n")}\n`);

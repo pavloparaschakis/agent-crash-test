@@ -1,0 +1,10 @@
+initial_state:
+  invoices: []
+tools:
+  create_invoice:
+    description: Create an invoice in the local fixture.
+    result: { created: true }
+    effects:
+      - op: append
+        path: invoices
+        value: { id: inv_1 }

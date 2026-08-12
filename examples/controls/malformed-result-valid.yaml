@@ -1,0 +1,23 @@
+version: 1
+id: control/malformed-result-valid
+name: Baseline structured result is valid
+description: The healthy no-mutation control for malformed-result handling.
+protocol: mcp
+transport: stdio
+server:
+  command: node
+  args: [dist/examples/broken-invoice-server.js]
+  cwd: ../..
+steps:
+  - id: customer
+    call: get_customer
+    arguments:
+      customer_id: cus_1
+    capture: customer
+assertions:
+  - id: customer-id-preserved
+    type: result_path_equals
+    step: customer
+    path: customer.id
+    expected: cus_1
+    remediation: Keep structured output valid and aligned with the declared schema.

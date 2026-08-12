@@ -1,0 +1,63 @@
+name: Release source preview
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Verify and publish source preview
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install reproducibly
+        run: npm ci
+      - name: Run the complete release acceptance suite
+        run: npm run acceptance
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Build source tarball and checksums
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          npm pack --pack-destination release-assets
+          node scripts/release-assets.mjs release-assets
+      - name: Create GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes_file="RELEASE_NOTES_${GITHUB_REF_NAME}.md"
+          if [[ ! -f "$notes_file" ]]; then
+            notes_file=""
+          fi
+          release_args=(
+            release
+            create
+            "$GITHUB_REF_NAME"
+            release-assets/*.tgz
+            release-assets/SHA256SUMS
+            release-assets/release-manifest.json
+            --repo "$GITHUB_REPOSITORY"
+            --verify-tag
+            --title "Agent Crash Test $GITHUB_REF_NAME"
+          )
+          if [[ -n "$notes_file" ]]; then
+            release_args+=(--notes-file "$notes_file")
+          else
+            release_args+=(--generate-notes)
+          fi
+          gh "${release_args[@]}"

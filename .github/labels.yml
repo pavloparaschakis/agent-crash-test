@@ -1,0 +1,29 @@
+# Declarative label set for the first public repository configuration.
+# GitHub does not apply this file automatically; apply it once with the
+# repository's preferred settings tool after ownership and repository name are
+# confirmed.
+labels:
+  - name: good first issue
+    color: "7057ff"
+    description: Friendly entry point for new contributors.
+  - name: help wanted
+    color: "008672"
+    description: Maintainer would welcome community help.
+  - name: fixture
+    color: "1d76db"
+    description: Adds or changes a crash-test fixture or pack.
+  - name: false positive
+    color: "fbca04"
+    description: Finding may not match the declared contract.
+  - name: security
+    color: "b60205"
+    description: Security-sensitive issue; follow SECURITY.md first.
+  - name: documentation
+    color: "0075ca"
+    description: Documentation or onboarding improvement.
+  - name: P1
+    color: "d93f0b"
+    description: Valuable follow-up after the v0.1 core.
+  - name: P2
+    color: "e99695"
+    description: Ecosystem expansion or hosted capability.

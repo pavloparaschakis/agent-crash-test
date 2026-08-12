@@ -1,0 +1,46 @@
+version: 1
+id: demo/timeout-retry-duplicates
+name: Timeout retry must not create a duplicate invoice
+description: A write that succeeds before its response times out must remain idempotent on retry.
+protocol: mcp
+transport: stdio
+server:
+  command: node
+  args: [dist/examples/broken-invoice-server.js]
+  cwd: ../..
+effect_probes:
+  - id: invoice_count
+    source: tool
+    tool: get_state
+    path: invoices.length
+    safety: declared_read_only
+    description: get_state is a read-only demonstration-only effect probe.
+steps:
+  - id: create
+    call: create_invoice
+    arguments:
+      customer_id: cus_1
+      amount: 100
+      request_id: req_timeout
+    retry:
+      max_attempts: 2
+      on: [timeout]
+mutations:
+  - id: timeout-after-write
+    type: timeout
+    applies_to: create_invoice
+    occurrence: 1
+    seed: 1
+assertions:
+  - id: exactly-one-invoice
+    type: effect_equals
+    effect: invoice_count
+    expected: 1
+    remediation: Use a request id or idempotency key to make retries safe.
+  - id: declared-idempotency-matches-effect
+    type: annotation_matches
+    tool: create_invoice
+    annotation: idempotentHint
+    expected: true
+artifacts:
+  remediation: The demo server intentionally fails this pack by claiming idempotency without enforcing it.

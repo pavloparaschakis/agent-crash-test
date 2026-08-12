@@ -1,0 +1,48 @@
+name: Action self-test
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - action.yml
+      - package.json
+      - package-lock.json
+      - tsconfig.json
+      - src/**
+      - scripts/**
+      - examples/packs/fixture-duplicate-call.yaml
+      - examples/invoice-server.fixture.yaml
+      - .github/workflows/action-self-test.yml
+
+permissions:
+  contents: read
+
+jobs:
+  local-action:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: ./
+        with:
+          path: examples/packs/fixture-duplicate-call.yaml
+          format: terminal,markdown,json
+          output: artifacts/action-self-test
+          fail-on: error
+  intentional-failure:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - id: crash
+        continue-on-error: true
+        uses: ./
+        with:
+          path: examples/packs/duplicate-call-duplicates.yaml
+          format: terminal,markdown,json
+          output: artifacts/action-failure
+          fail-on: error
+      - name: Assert the failing pack failed
+        if: always()
+        shell: bash
+        run: test "${{ steps.crash.outcome }}" = failure
