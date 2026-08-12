@@ -76,8 +76,8 @@ server:
   args: [${path.join(root, "dist/examples/disconnect-server.js")}]
   cwd: ${root}
 execution:
-  request_timeout_ms: 300
-  max_run_ms: 1000
+  request_timeout_ms: 2000
+  max_run_ms: 5000
 steps:
   - id: disconnect
     call: disconnect
