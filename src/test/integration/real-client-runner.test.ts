@@ -61,7 +61,7 @@ async function runCase(duplicate: boolean): Promise<{
       "test",
       packPath,
       "--client",
-      `${process.execPath} ${client}`,
+      `"${process.execPath}" "${client}"`,
       "--format",
       "json",
       "--output",
